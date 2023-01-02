@@ -11,7 +11,7 @@
 		6E2D0BCD2962A437002B7F63 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E2D0BCC2962A437002B7F63 /* ContentView.swift */; };
 		6E2D0BCF2962A438002B7F63 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6E2D0BCE2962A438002B7F63 /* Assets.xcassets */; };
 		6E2D0BD22962A438002B7F63 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6E2D0BD12962A438002B7F63 /* Preview Assets.xcassets */; };
-		6E2D0BDB2962A903002B7F63 /* APIResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E2D0BDA2962A903002B7F63 /* APIResponse.swift */; };
+		6E2D0BDB2962A903002B7F63 /* APIRequests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E2D0BDA2962A903002B7F63 /* APIRequests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -20,7 +20,7 @@
 		6E2D0BCC2962A437002B7F63 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		6E2D0BCE2962A438002B7F63 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		6E2D0BD12962A438002B7F63 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		6E2D0BDA2962A903002B7F63 /* APIResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIResponse.swift; sourceTree = "<group>"; };
+		6E2D0BDA2962A903002B7F63 /* APIRequests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIRequests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,7 +57,7 @@
 				6E2D0BCC2962A437002B7F63 /* ContentView.swift */,
 				6E2D0BCE2962A438002B7F63 /* Assets.xcassets */,
 				6E2D0BD02962A438002B7F63 /* Preview Content */,
-				6E2D0BDA2962A903002B7F63 /* APIResponse.swift */,
+				6E2D0BDA2962A903002B7F63 /* APIRequests.swift */,
 			);
 			path = Pokedex;
 			sourceTree = "<group>";
@@ -142,7 +142,7 @@
 			files = (
 				6E2D0BCD2962A437002B7F63 /* ContentView.swift in Sources */,
 				6E2D0BCB2962A437002B7F63 /* PokedexApp.swift in Sources */,
-				6E2D0BDB2962A903002B7F63 /* APIResponse.swift in Sources */,
+				6E2D0BDB2962A903002B7F63 /* APIRequests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

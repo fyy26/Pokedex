@@ -72,82 +72,22 @@ struct ContentView: View {
                 })
                 .onChange(of: pokemonsToLoad) { _ in
                     for pokemon in pokemonsToLoad {
-                        loadPokemonDetails(url: pokemon.url)
+                        APIRequests.loadPokemonDetails(url: pokemon.url, onCompletion: { pokemonDetail in
+                            pokemonDetails.append(pokemonDetail)
+                            if selectedPokemon == nil {
+                                selectedPokemon = pokemonDetail
+                            }
+                        })
                     }
                 }
     }
 
     func loadPokemons() {
-        // Prepare the url to fetch
-        guard let urlString = nextPageURL else {
-            print("Nothing more to fetch")
-            return
-        }
-        guard let url = URL(string: urlString) else {
-            print("Invalid URL")
-            return
-        }
-        // Make the request
-        let urlRequest = URLRequest(url: url)
-        let dataTask = URLSession.shared.dataTask(with: urlRequest) { (data, response, error) in
-            if let error = error {
-                print("Request error: ", error)
-                return
-            }
-            guard let response = response as? HTTPURLResponse else {
-                return
-            }
-            if response.statusCode == 200 {
-                guard let data = data else {
-                    return
-                }
-                DispatchQueue.main.async {
-                    do {
-                        let pokemonPage = try JSONDecoder().decode(PokemonPage.self, from: data)
-                        previousPageURL = pokemonPage.previous
-                        nextPageURL = pokemonPage.next
-                        pokemonsToLoad = pokemonPage.results
-                    } catch let error {
-                        print("Decoding error: ", error)
-                    }
-                }
-            }
-        }
-        dataTask.resume()
-    }
-
-    func loadPokemonDetails(url: String) {
-        guard let pokemonURL = URL(string: url) else {
-            print("Invalid URL")
-            return
-        }
-        let urlRequest = URLRequest(url: pokemonURL)
-        let dataTask = URLSession.shared.dataTask(with: urlRequest) { (data, response, error) in
-            if let error = error {
-                print("Request error: ", error)
-                return
-            }
-            guard let response = response as? HTTPURLResponse else {
-                return
-            }
-            if response.statusCode == 200 {
-                guard let data = data else {
-                    return
-                }
-                DispatchQueue.main.async {
-                    do {
-                        let pokemonDetail = try JSONDecoder().decode(PokemonDetail.self, from: data)
-                        pokemonDetails.append(pokemonDetail)
-                        if selectedPokemon == nil {
-                            selectedPokemon = pokemonDetail
-                        }
-                    } catch let error {
-                        print("Decoding error: ", error)
-                    }
-                }
-            }
-        }
-        dataTask.resume()
+        APIRequests.loadPokemons(nextPageURL: nextPageURL, onCompletion: { pokemonPage in
+            previousPageURL = pokemonPage.previous
+            nextPageURL = pokemonPage.next
+            pokemonsToLoad = pokemonPage.results
+        })
     }
 }
 
