@@ -11,7 +11,7 @@ struct PokemonPage: Codable {
     var next: String?
 }
 
-struct Pokemon: Identifiable, Codable {
+struct Pokemon: Identifiable, Codable, Equatable {
     var name: String
     var url: String
     var id: String {

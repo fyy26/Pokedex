@@ -8,11 +8,12 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var pokemons = [Pokemon]()
+    @State private var pokemonsToLoad = [Pokemon]()
     @State private var pokemonDetails = [PokemonDetail]()
     @State private var previousPageURL: String? = nil
     @State private var nextPageURL: String? = "https://pokeapi.co/api/v2/pokemon?limit=20&offset=0"
     @State private var selectedPokemon: PokemonDetail? = nil
+    private let stageHeight: CGFloat = 200
 
     let columns = [
         GridItem(.adaptive(minimum: 100))
@@ -23,7 +24,7 @@ struct ContentView: View {
             ZStack {
                 Rectangle()
                         .fill(.black)
-                        .frame(height: 200)
+                        .frame(height: stageHeight)
                         .padding(10)
                 if let selectedPokemonDetail = selectedPokemon {
                     AsyncImage(
@@ -31,7 +32,7 @@ struct ContentView: View {
                             content: { image in
                                 image.resizable()
                                         .aspectRatio(contentMode: .fit)
-                                        .frame(maxHeight: 200)
+                                        .frame(maxHeight: stageHeight)
                             },
                             placeholder: {
                                 ProgressView()
@@ -39,21 +40,41 @@ struct ContentView: View {
                     )
                 }
             }
-            ScrollView {
-                LazyVGrid(columns: columns, spacing: 10) {
-                    ForEach(pokemonDetails) { pokemonDetail in
-                        AsyncImage(url: URL(string: pokemonDetail.sprites.front_default))
-                            .onTapGesture {
-                                selectedPokemon = pokemonDetail
+            GeometryReader { geo in
+                ScrollViewReader { scrollView in
+                    ScrollView {
+//                        PullToRefresh(coordinateSpaceName: "pullToRefresh", offset: stageHeight, frameHeight: geo.size.height) {
+//                            print("load previous page")
+//                        }
+                        LazyVGrid(columns: columns, spacing: 10) {
+                            ForEach(pokemonDetails) { pokemonDetail in
+                                AsyncImage(url: URL(string: pokemonDetail.sprites.front_default))
+                                        .onTapGesture {
+                                            selectedPokemon = pokemonDetail
+                                        }
                             }
+                        }
+                                .frame(minHeight: geo.size.height)
+                                .padding(.horizontal)
+                        if (!pokemonDetails.isEmpty && nextPageURL != nil) {
+                            PullToRefresh(coordinateSpaceName: "pullToRefresh", pullsDown: false, offset: stageHeight, frameHeight: geo.size.height) {
+                                print("load next page")
+                                loadPokemons()
+                            }
+                                    .frame(alignment: .bottom)
+                        }
                     }
                 }
-                        .padding(.horizontal)
             }
         }
                 .onAppear(perform: {
                     loadPokemons()
                 })
+                .onChange(of: pokemonsToLoad) { _ in
+                    for pokemon in pokemonsToLoad {
+                        loadPokemonDetails(url: pokemon.url)
+                    }
+                }
     }
 
     func loadPokemons() {
@@ -85,14 +106,9 @@ struct ContentView: View {
                         let pokemonPage = try JSONDecoder().decode(PokemonPage.self, from: data)
                         previousPageURL = pokemonPage.previous
                         nextPageURL = pokemonPage.next
-                        pokemons = pokemonPage.results
+                        pokemonsToLoad = pokemonPage.results
                     } catch let error {
                         print("Decoding error: ", error)
-                    }
-                    // Load the image of each pokemon
-                    pokemonDetails = [PokemonDetail]()
-                    for pokemon in pokemons {
-                        loadPokemonDetails(url: pokemon.url)
                     }
                 }
             }
@@ -132,5 +148,46 @@ struct ContentView: View {
             }
         }
         dataTask.resume()
+    }
+}
+
+struct PullToRefresh: View {
+
+    var coordinateSpaceName: String
+    var pullsDown = true  // true = pull down to trigger, false = pull up to trigger
+    var offset: CGFloat = 0
+    var frameHeight: CGFloat
+    var onRefresh: () -> Void
+
+    @State var needRefresh: Bool = false
+
+    var body: some View {
+        GeometryReader { geo in
+            if (pullsDown && geo.frame(in: .named(coordinateSpaceName)).midY > offset + 50 ||
+                    !pullsDown && geo.frame(in: .named(coordinateSpaceName)).midY < offset + frameHeight - 50) {
+                Spacer()
+                        .onAppear {
+                            needRefresh = true
+                        }
+            } else if (pullsDown && geo.frame(in: .named(coordinateSpaceName)).maxY < offset + 10 ||
+                    !pullsDown && geo.frame(in: .named(coordinateSpaceName)).maxY > offset + frameHeight) {
+                Spacer()
+                        .onAppear {
+                            if needRefresh {
+                                needRefresh = false
+                                onRefresh()
+                            }
+                        }
+            }
+            HStack {
+                Spacer()
+                if needRefresh {
+                    ProgressView()
+                }
+                Spacer()
+            }
+        }
+                .padding(.top, pullsDown ? -50 : 0)
+                .padding(.bottom, pullsDown ? 0 : -50)
     }
 }

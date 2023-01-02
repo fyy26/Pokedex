@@ -20,7 +20,7 @@ build/
 !default.mode2v3
 !default.perspectivev3
 *.xccheckout
-xcuserdata/
+#xcuserdata/
 *.moved-aside
 
 # COCOAPODS:
