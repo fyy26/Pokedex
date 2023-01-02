@@ -14,6 +14,7 @@ struct ContentView: View {
     @State private var nextPageURL: String? = "https://pokeapi.co/api/v2/pokemon?limit=20&offset=0"
     @State private var selectedPokemon: PokemonDetail? = nil
     private let stageHeight: CGFloat = 200
+    private let cellHeight: CGFloat = 100
 
     let columns = [
         GridItem(.adaptive(minimum: 100))
@@ -49,6 +50,7 @@ struct ContentView: View {
                         LazyVGrid(columns: columns, spacing: 10) {
                             ForEach(pokemonDetails) { pokemonDetail in
                                 AsyncImage(url: URL(string: pokemonDetail.sprites.front_default))
+                                        .frame(height: cellHeight)
                                         .onTapGesture {
                                             selectedPokemon = pokemonDetail
                                         }
@@ -58,7 +60,6 @@ struct ContentView: View {
                                 .padding(.horizontal)
                         if (!pokemonDetails.isEmpty && nextPageURL != nil) {
                             PullToRefresh(coordinateSpaceName: "pullToRefresh", pullsDown: false, offset: stageHeight, frameHeight: geo.size.height) {
-                                print("load next page")
                                 loadPokemons()
                             }
                                     .frame(alignment: .bottom)
