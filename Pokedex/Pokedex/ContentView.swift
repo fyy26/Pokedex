@@ -72,14 +72,14 @@ struct ContentView: View {
                     loadPokemons()
                 })
                 .onChange(of: pokemonsToLoad) { _ in
-                    for pokemon in pokemonsToLoad {
-                        APIRequests.loadPokemonDetails(url: pokemon.url, onCompletion: { pokemonDetail in
+                    APIRequests.loadPokemonDetails(pokemonsToLoad: pokemonsToLoad, onCompletion: { loadedDetails in
+                        if selectedPokemon == nil && !loadedDetails.isEmpty {
+                            selectedPokemon = loadedDetails[0]
+                        }
+                        for pokemonDetail in loadedDetails {
                             pokemonDetails.append(pokemonDetail)
-                            if selectedPokemon == nil {
-                                selectedPokemon = pokemonDetail
-                            }
-                        })
-                    }
+                        }
+                    })
                 }
     }
 

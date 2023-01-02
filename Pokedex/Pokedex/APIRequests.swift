@@ -70,34 +70,50 @@ class APIRequests: Any {
         dataTask.resume()
     }
 
-    static func loadPokemonDetails(url: String, onCompletion: @escaping ((PokemonDetail) -> ())) {
-        guard let pokemonURL = URL(string: url) else {
-            print("Invalid URL")
-            return
-        }
-        let urlRequest = URLRequest(url: pokemonURL)
-        let dataTask = URLSession.shared.dataTask(with: urlRequest) { (data, response, error) in
-            if let error = error {
-                print("Request error: ", error)
+    static func loadPokemonDetails(pokemonsToLoad: [Pokemon], onCompletion: @escaping (([PokemonDetail]) -> ())) {
+        let dispatchGroup = DispatchGroup()
+        var loadedDetails = [PokemonDetail]()
+        let dispatchSemaphore = DispatchSemaphore(value: 0)
+
+        for pokemon in pokemonsToLoad {
+            dispatchGroup.enter()
+            guard let pokemonURL = URL(string: pokemon.url) else {
+                print("Invalid URL")
                 return
             }
-            guard let response = response as? HTTPURLResponse else {
-                return
-            }
-            if response.statusCode == 200 {
-                guard let data = data else {
+            let urlRequest = URLRequest(url: pokemonURL)
+            let dataTask = URLSession.shared.dataTask(with: urlRequest) { (data, response, error) in
+                defer {
+                    dispatchGroup.leave()
+                }
+                if let error = error {
+                    print("Request error: ", error)
                     return
                 }
-                DispatchQueue.main.async {
+                guard let response = response as? HTTPURLResponse else {
+                    return
+                }
+                if response.statusCode == 200 {
+                    guard let data = data else {
+                        return
+                    }
                     do {
                         let pokemonDetail = try JSONDecoder().decode(PokemonDetail.self, from: data)
-                        onCompletion(pokemonDetail)
+                        loadedDetails.append(pokemonDetail)
+                        dispatchSemaphore.signal()
                     } catch let error {
                         print("Decoding error: ", error)
                     }
                 }
             }
+            dataTask.resume()
+
+            dispatchSemaphore.wait()
         }
-        dataTask.resume()
+
+        // All calls finished
+        dispatchGroup.notify(queue: .main) {
+            onCompletion(loadedDetails)
+        }
     }
 }
