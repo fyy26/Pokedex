@@ -19,16 +19,17 @@ struct ContentView: View {
 
     let columns = [GridItem(.adaptive(minimum: 100))]
 
+    // The stage image flash every 0.5 seconds
     let imageSwitchTimer = Timer.publish(every: 0.5, on: .main, in: .common).autoconnect()
 
     var body: some View {
         VStack {
             ZStack {
-                Rectangle()
+                Rectangle() // The black stage background
                         .fill(.black)
                         .frame(height: stageHeight)
                         .padding(10)
-                        .overlay(alignment: .topTrailing) {
+                        .overlay(alignment: .topTrailing) {  // The heart button
                             if let selectedPokemonDetail = selectedPokemon {
                                 Image(systemName: likedPokemons.contains(selectedPokemonDetail.name) ? "heart.fill" : "heart")
                                         .resizable()
@@ -47,6 +48,8 @@ struct ContentView: View {
                                         }
                             }
                         }
+
+                // The selected pokemon
                 if let selectedPokemonDetail = selectedPokemon {
                     HStack {
                         VStack(alignment: .leading) {
@@ -73,6 +76,8 @@ struct ContentView: View {
                     }
                 }
             }
+            
+            // The list of pokemons
             GeometryReader { geo in
                 ScrollViewReader { scrollView in
                     ScrollView {
@@ -98,7 +103,7 @@ struct ContentView: View {
             }
         }
                 .onAppear(perform: {
-                    URLCache.shared.diskCapacity = 10_000_000 // ~10 MB disk cache space
+                    URLCache.shared.diskCapacity = 10_000_000 // configure ~10 MB disk cache space
                     loadPokemons()
                 })
                 .onChange(of: pokemonsToLoad) { _ in
