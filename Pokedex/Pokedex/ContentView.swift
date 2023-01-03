@@ -10,8 +10,7 @@ import SwiftUI
 struct ContentView: View {
     @State private var pokemonsToLoad = [Pokemon]()
     @State private var pokemonDetails = [PokemonDetail]()
-    @State private var previousPageURL: String? = nil
-    @State private var nextPageURL: String? = "https://pokeapi.co/api/v2/pokemon?limit=20&offset=0"
+    @State private var nextPageURL: String? = "https://pokeapi.co/api/v2/pokemon?limit=20&offset=0" // Change the limit param to modify batch size
     @State private var selectedPokemon: PokemonDetail? = nil
     @State private var stageImageIsShiny = false
     private let stageHeight: CGFloat = 200
@@ -48,9 +47,6 @@ struct ContentView: View {
             GeometryReader { geo in
                 ScrollViewReader { scrollView in
                     ScrollView {
-//                        PullToRefresh(coordinateSpaceName: "pullToRefresh", offset: stageHeight, frameHeight: geo.size.height) {
-//                            print("load previous page")
-//                        }
                         LazyVGrid(columns: columns, spacing: 10) {
                             ForEach(pokemonDetails) { pokemonDetail in
                                 AsyncImage(url: URL(string: pokemonDetail.sprites.front_default))
@@ -73,6 +69,7 @@ struct ContentView: View {
             }
         }
                 .onAppear(perform: {
+                    URLCache.shared.diskCapacity = 10_000_000 // ~10 MB disk cache space
                     loadPokemons()
                 })
                 .onChange(of: pokemonsToLoad) { _ in
@@ -89,7 +86,6 @@ struct ContentView: View {
 
     func loadPokemons() {
         APIRequests.loadPokemons(nextPageURL: nextPageURL, onCompletion: { pokemonPage in
-            previousPageURL = pokemonPage.previous
             nextPageURL = pokemonPage.next
             pokemonsToLoad = pokemonPage.results
         })
