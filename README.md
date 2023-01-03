@@ -5,9 +5,11 @@
 
 A Pokédex iOS app implemented with SwiftUI!
 
-<img src="Demos/Launch_Screen.jpg" alt="Launch Screen" height="330"/>
-<img src="Demos/Home_Screen.jpg" alt="Home Screen" height="330"/>
-<img src="Demos/Liked_Pokemon.jpg" alt="Liked Pokemon" height="330"/>
+<p float="left">
+  <img src="Demos/Launch_Screen.jpg" alt="Launch Screen" height="330"/>
+  <img src="Demos/Home_Screen.jpg" alt="Home Screen" height="330"/>
+  <img src="Demos/Liked_Pokemon.jpg" alt="Liked Pokemon" height="330"/>
+</p>
 
 [Demo Video](Demos/Demo_Video.mov)
 
@@ -21,9 +23,9 @@ git clone https://github.com/fyy26/Pokedex.git
 4. Build and run the app.
 
 ## 🌟 Features
-* Display all pokémons in a scrollable grid by order of id.
+* Display all pokémons in a scrollable grid by order of ID.
   * Fetch pokémons in batches of 20; fetching is triggered when the user continues to scroll at the end of the scroll view.
-* Tap any pokémon in the grid to display a bigger image along with simple details including id and name in the top stage.
+* Tap any pokémon in the grid to display a bigger image along with simple details including ID and name in the top stage.
   * The sprite displayed in the stage is animated.
   * The user can like the selected pokémon by tapping on the heart icon.
     * Currently, this feature is just a front-end proof of concept, and the collection of liked pokémons is only persistent
@@ -46,9 +48,6 @@ previous pages.
   detail fetches to complete to start building the grid. Each grid item can be an instance of a custom view which shows
   an image placeholder at the beginning and keeps track of its own pokémon name and details URL. Each custom grid item
   view then fires its own details API call to fetch the sprite image for itself and replace the image placeholder.
-* Decided to wait for one detail to finish fetching before the next such that the order is not messed up
-  * Alternative is insert at certain position, but default filler for values before index is tricky + 
-  insert at index is O(n) while append is O(1)
 * The `AsyncImage` native API caches fetched images automatically with some simple configuration<sup>[[2]](https://www.avanderlee.com/swiftui/downloading-caching-images/)</sup>.
 Since there are only 1154 pokémons and each sprite image is 4.4 KB, the collection of all images takes only 5077 KB or 5 MB,
 which is equal to the average size of a single photo taken by a modern phone. Hence, the app should cache at least the most
