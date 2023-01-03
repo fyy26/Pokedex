@@ -13,6 +13,7 @@ struct ContentView: View {
     @State private var nextPageURL: String? = "https://pokeapi.co/api/v2/pokemon?limit=20&offset=0" // Change the limit param to modify batch size
     @State private var selectedPokemon: PokemonDetail? = nil
     @State private var stageImageIsShiny = false
+    @State private var likedPokemons = [String]()
     private let stageHeight: CGFloat = 200
     private let cellHeight: CGFloat = 100
 
@@ -27,21 +28,49 @@ struct ContentView: View {
                         .fill(.black)
                         .frame(height: stageHeight)
                         .padding(10)
+                        .overlay(alignment: .topTrailing) {
+                            if let selectedPokemonDetail = selectedPokemon {
+                                Image(systemName: likedPokemons.contains(selectedPokemonDetail.name) ? "heart.fill" : "heart")
+                                        .resizable()
+                                        .padding(30)
+                                        .frame(width: 90.0, height: 85.0)
+                                        .foregroundColor(.white)
+                                        .contentShape(Rectangle())
+                                        .onTapGesture {
+                                            if likedPokemons.contains(selectedPokemonDetail.name) {
+                                                if let index = likedPokemons.firstIndex(of: selectedPokemonDetail.name) {
+                                                    likedPokemons.remove(at: index)
+                                                }
+                                            } else {
+                                                likedPokemons.append(selectedPokemonDetail.name)
+                                            }
+                                        }
+                            }
+                        }
                 if let selectedPokemonDetail = selectedPokemon {
-                    AsyncImage(
-                            url: URL(string: stageImageIsShiny ? selectedPokemonDetail.sprites.front_shiny : selectedPokemonDetail.sprites.front_default),
-                            content: { image in
-                                image.resizable()
-                                        .aspectRatio(contentMode: .fit)
-                                        .frame(maxHeight: stageHeight)
-                            },
-                            placeholder: {
-                                ProgressView()
-                            }
-                    )
-                            .onReceive(imageSwitchTimer) { _ in
-                                stageImageIsShiny.toggle()
-                            }
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text("#\(selectedPokemonDetail.id)")
+                            Text(selectedPokemonDetail.name.capitalized)
+                        }
+                                .foregroundColor(.white)
+                                .font(.system(size: 20, weight: .heavy, design: .default))
+                                .padding(.leading, 10)
+                        AsyncImage(
+                                url: URL(string: stageImageIsShiny ? selectedPokemonDetail.sprites.front_shiny : selectedPokemonDetail.sprites.front_default),
+                                content: { image in
+                                    image.resizable()
+                                            .aspectRatio(contentMode: .fit)
+                                            .frame(maxHeight: stageHeight)
+                                },
+                                placeholder: {
+                                    ProgressView()
+                                }
+                        )
+                                .onReceive(imageSwitchTimer) { _ in
+                                    stageImageIsShiny.toggle()
+                                }
+                    }
                 }
             }
             GeometryReader { geo in
