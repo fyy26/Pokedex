@@ -13,12 +13,13 @@ struct ContentView: View {
     @State private var previousPageURL: String? = nil
     @State private var nextPageURL: String? = "https://pokeapi.co/api/v2/pokemon?limit=20&offset=0"
     @State private var selectedPokemon: PokemonDetail? = nil
+    @State private var stageImageIsShiny = false
     private let stageHeight: CGFloat = 200
     private let cellHeight: CGFloat = 100
 
-    let columns = [
-        GridItem(.adaptive(minimum: 100))
-    ]
+    let columns = [GridItem(.adaptive(minimum: 100))]
+
+    let imageSwitchTimer = Timer.publish(every: 0.5, on: .main, in: .common).autoconnect()
 
     var body: some View {
         VStack {
@@ -29,7 +30,7 @@ struct ContentView: View {
                         .padding(10)
                 if let selectedPokemonDetail = selectedPokemon {
                     AsyncImage(
-                            url: URL(string: selectedPokemonDetail.sprites.front_default),
+                            url: URL(string: stageImageIsShiny ? selectedPokemonDetail.sprites.front_shiny : selectedPokemonDetail.sprites.front_default),
                             content: { image in
                                 image.resizable()
                                         .aspectRatio(contentMode: .fit)
@@ -39,6 +40,9 @@ struct ContentView: View {
                                 ProgressView()
                             }
                     )
+                            .onReceive(imageSwitchTimer) { _ in
+                                stageImageIsShiny.toggle()
+                            }
                 }
             }
             GeometryReader { geo in

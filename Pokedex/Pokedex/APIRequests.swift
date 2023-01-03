@@ -1,5 +1,5 @@
 //
-//  APIResponse.swift
+//  APIRequests.swift
 //  Pokedex
 //
 //  Created by Yuying Fan on 1/2/23.
@@ -28,6 +28,7 @@ struct PokemonDetail: Identifiable, Codable {
 
     struct Sprites: Codable {
         var front_default: String
+        var front_shiny: String
     }
 }
 
